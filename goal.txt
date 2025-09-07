@@ -1,0 +1,6 @@
+1. face detection with yolov11. Draw bounding boxes around the face if detected in a camera
+2. use Dlib face recognition module + ARCnet's ARCFACE for face recognition. Basically add two layers of recognition pipeline to pass the user through. Any one of them fails, the user becomes unverified (AND logic). Furthermore Compare Dlib vs ArcFace in terms of performance, distance margin, errors.
+3. built own spoof detection model instead of 3rd party libraries for better novelty of the entire project.
+
+once the user is passed through the above pipeline successfully, he/she will be verified and allowed for payments
+otherwise failure to comply in any of the above stage will kick the user out of the process
