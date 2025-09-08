@@ -1,4 +1,4 @@
-ultralytics
+mediapipe
 face_recognition
 opencv-python
 numpy

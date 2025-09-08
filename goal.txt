@@ -1,6 +1,19 @@
-1. face detection with yolov11. Draw bounding boxes around the face if detected in a camera
-2. use Dlib face recognition module + ARCnet's ARCFACE for face recognition. Basically add two layers of recognition pipeline to pass the user through. Any one of them fails, the user becomes unverified (AND logic). Furthermore Compare Dlib vs ArcFace in terms of performance, distance margin, errors.
-3. built own spoof detection model instead of 3rd party libraries for better novelty of the entire project.
+1. Face Detection & keypoint/landmark Localization with MediaPipe.
+- Use Google's MediaPipe Face-Mesh to handle face detection and landmark localization.
+- This model is specifically optimized for real-time, on-device performance, making it ideal for smartphones of all capabilities. It provides a dense mesh of 468 3D landmarks, offering superior data for the alignment step.(better than previous idea of using YOLOv11)
 
-once the user is passed through the above pipeline successfully, he/she will be verified and allowed for payments
-otherwise failure to comply in any of the above stage will kick the user out of the process
+2. Robust Face Alignment.
+From the 468 landmarks provided by MediaPipe, extract the precise coordinates for the eyes and mouth.
+Use these points to perform a robust geometric transformation (alignment) on the face, normalizing it for rotation, scale, and position before recognition.
+
+3. Face Recognition with ArcFace.
+Use a pre-trained ArcFace model to convert the perfectly aligned face image into a high-accuracy, 512-dimension embedding (the user's "faceprint").
+
+4. Liveness Detection via Challenge-Response.
+Implement a mandatory "Challenge-Response" liveness test to prevent spoofing attacks. The system will randomly ask the user to perform a live action (e.g., "Smile," "Blink your eyes") which will be verified using the MediaPipe landmarks.
+
+5. Final Verification Pipeline.
+A user is successfully verified only if they pass both the Liveness Detection challenge and the ArcFace recognition match. Failure at any stage will terminate the process. (AND logic)
+
+6. Project Report Goal.
+For the academic report, conduct a comparative analysis of different recognition models (e.g., Dlib vs. ArcFace) to evaluate and contrast their accuracy, speed, and robustness for the project's security requirements.

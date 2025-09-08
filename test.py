@@ -1,15 +1,26 @@
-from ultralytics import YOLO
 import cv2
-import numpy as np
+import mediapipe as mp
+import time
 
-model = YOLO("models/yolov11n-face.pt")
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(
+    max_num_faces=1,
+    refine_landmarks=True,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5)
+
+mp_drawing = mp.solutions.drawing_utils
+drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
     print("[ERROR] Could not open webcam.")
     exit()
-print("[INFO] Starting face detection...")
+print("[INFO] Starting face landmark detection...")
+
+prev_frame_time = 0
+new_frame_time = 0
 
 while True:
     ret, frame = cap.read()
@@ -17,17 +28,29 @@ while True:
         print("[ERROR] Failed to grab frame.")
         break
 
-    results = model.predict(frame, conf=0.5)
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-    for r in results:
-        for box in r.boxes:
-            x1, y1, x2, y2 = map(int, box.xyxy[0])
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.putText(frame, "Face", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+    results = face_mesh.process(rgb_frame)
 
-    cv2.imshow("YOLOv11 Face Detection", frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if results.multi_face_landmarks:
+        for face_landmarks in results.multi_face_landmarks:
+            mp_drawing.draw_landmarks(
+                image=frame,
+                landmark_list=face_landmarks,
+                connections=mp_face_mesh.FACEMESH_TESSELATION,
+                landmark_drawing_spec=drawing_spec,
+                connection_drawing_spec=drawing_spec)
+
+    new_frame_time = time.time()
+    fps = 1/(new_frame_time-prev_frame_time)
+    prev_frame_time = new_frame_time
+    cv2.putText(frame, f"FPS: {int(fps)}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+    cv2.imshow("MediaPipe Face Mesh", frame)
+
+    if cv2.waitKey(5) & 0xFF == ord('q'):
         break
 
 cap.release()
 cv2.destroyAllWindows()
+face_mesh.close()
