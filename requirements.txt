@@ -5,3 +5,5 @@ numpy
 pandas
 insightface
 scikit-learn
+tensorflow
+deepface
