@@ -28,10 +28,10 @@ The methodology and experimental results of this project are detailed here :
 
 ## 🈴Prerequisites
 
-* Python 3.x
+* Python 3.8
 * OpenCV
 * MediaPipe
-* TensorFlow / PyTorch (depending on your ArcFace implementation)
+* TensorFlow (ARCFACE)
 * NumPy
 
 ## 🤹System Workflow
